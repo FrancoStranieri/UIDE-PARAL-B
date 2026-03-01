@@ -1,0 +1,172 @@
+import pygame
+import sys
+import random
+
+pygame.init()
+
+ANCHO = 1000
+ALTO = 600
+TAM = 20
+
+pantalla = pygame.display.set_mode((ANCHO, ALTO))
+pygame.display.set_caption("Juego de la Culebrita")
+
+# 🖼 Cargar imagen de fondo
+fondo = pygame.image.load("fondo.jpg")
+fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
+
+NEGRO = (0, 0, 0)
+VERDE = (0, 255, 0)
+BLANCO = (255, 255, 255)
+
+clock = pygame.time.Clock()
+
+# Fuentes
+fuente_titulo = pygame.font.SysFont("Arial", 60)
+fuente_texto = pygame.font.SysFont("Arial", 30)
+
+
+# =========================
+#  MENU
+# =========================
+def menu():
+    while True:
+        pantalla.blit(fondo, (0, 0))
+
+        titulo = fuente_titulo.render("JUEGO DE LA CULEBRITA", True, VERDE)
+        texto = fuente_texto.render("Presiona ESPACIO para jugar", True, BLANCO)
+        salir = fuente_texto.render("Presiona ESC para salir", True, BLANCO)
+
+        pantalla.blit(titulo, (ANCHO//2 - titulo.get_width()//2, 200))
+        pantalla.blit(texto, (ANCHO//2 - texto.get_width()//2, 300))
+        pantalla.blit(salir, (ANCHO//2 - salir.get_width()//2, 350))
+
+        pygame.display.update()
+
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_SPACE:
+                    return
+                if evento.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+
+
+# =========================
+#  JUEGO
+# =========================
+def juego():
+
+    snake = [[100, 100]]
+    direccion = "RIGHT"
+
+    comida_x = random.randrange(0, ANCHO, TAM)
+    comida_y = random.randrange(0, ALTO, TAM)
+
+    color_comida = (
+        random.randint(0, 255),
+        random.randint(0, 255),
+        random.randint(0, 255)
+    )
+
+    while True:
+
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_LEFT:
+                    direccion = "LEFT"
+                if evento.key == pygame.K_RIGHT:
+                    direccion = "RIGHT"
+                if evento.key == pygame.K_UP:
+                    direccion = "UP"
+                if evento.key == pygame.K_DOWN:
+                    direccion = "DOWN"
+
+        # Movimiento
+        cabeza = snake[0].copy()
+
+        if direccion == "RIGHT":
+            cabeza[0] += TAM
+        if direccion == "LEFT":
+            cabeza[0] -= TAM
+        if direccion == "UP":
+            cabeza[1] -= TAM
+        if direccion == "DOWN":
+            cabeza[1] += TAM
+
+        snake.insert(0, cabeza)
+
+        #  choque con borde
+        if cabeza[0] < 0 or cabeza[0] >= ANCHO or cabeza[1] < 0 or cabeza[1] >= ALTO:
+            return
+
+        #  detectar comida
+        if cabeza[0] == comida_x and cabeza[1] == comida_y:
+            comida_x = random.randrange(0, ANCHO, TAM)
+            comida_y = random.randrange(0, ALTO, TAM)
+
+            color_comida = (
+                random.randint(0, 255),
+                random.randint(0, 255),
+                random.randint(0, 255)
+            )
+        else:
+            snake.pop()
+
+        # Dibujar fondo
+        pantalla.blit(fondo, (0, 0))
+
+        # Dibujar comida
+        pygame.draw.rect(
+            pantalla,
+            color_comida,
+            (comida_x, comida_y, TAM, TAM),
+            border_radius=6
+        )
+
+        # Dibujar serpiente
+        for i, bloque in enumerate(snake):
+
+            if i == 0:
+                color = (0, 200, 0)
+            else:
+                color = VERDE
+
+            pygame.draw.rect(
+                pantalla,
+                color,
+                (bloque[0], bloque[1], TAM, TAM),
+                border_radius=6
+            )
+
+        #  OJOS
+        cabeza_x, cabeza_y = snake[0]
+
+        pygame.draw.circle(pantalla, (255, 255, 255),
+                           (cabeza_x + 6, cabeza_y + 6), 4)
+        pygame.draw.circle(pantalla, (255, 255, 255),
+                           (cabeza_x + 14, cabeza_y + 6), 4)
+
+        pygame.draw.circle(pantalla, (0, 0, 0),
+                           (cabeza_x + 6, cabeza_y + 6), 2)
+        pygame.draw.circle(pantalla, (0, 0, 0),
+                           (cabeza_x + 14, cabeza_y + 6), 2)
+
+        pygame.display.update()
+        clock.tick(10)
+
+
+# =========================
+#  LOOP PRINCIPAL
+# =========================
+while True:
+    menu()
+    juego()

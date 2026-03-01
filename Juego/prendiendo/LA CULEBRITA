@@ -1,0 +1,26 @@
+#cuerpo de la culebrita
+serpiente = [(100, 100), (90, 100), (80, 100)]
+#comida
+comida = (60, 60)
+#mapa
+mapa = (600, 600)
+#teclas de movimiento
+teclas = {
+    "up"
+    "down"
+    "left"
+    "right"
+}
+#funciones de movimiento
+def mover_arriba():
+    if serpiente[-1] == teclas["up"]:
+        serpiente.append((serpiente[-1][0], serpiente[-1][1] - 10))
+def mover_abajo():
+    if serpiente[-1] == teclas["down"]:
+        serpiente.append((serpiente[-1][0], serpiente[-1][1] + 10))
+def mover_izquierda():
+    if serpiente[-1] == teclas["left"]:
+        serpiente.append((serpiente[-1][0] - 10, serpiente[-1][1]))
+def mover_derecha():
+    if serpiente[-1] == teclas["right"]:
+        serpiente.append((serpiente[-1][0] + 10, serpiente[-1][1]))
